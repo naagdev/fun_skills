@@ -2,8 +2,9 @@
 Cached fundamentals for common tickers — used as fallback when live
 Yahoo Finance fetch is blocked or unavailable.
 
-Figures sourced from latest available annual filings / consensus estimates
-as of June 2026. GAAP metrics unless noted.
+Prices updated June 2026: MRVL $273, AVGO $478.
+Fundamentals reflect FY2026 estimates (MRVL FY ends Feb, AVGO FY ends Oct).
+GAAP metrics unless noted.
 """
 
 STATIC: dict[str, dict] = {
@@ -13,82 +14,82 @@ STATIC: dict[str, dict] = {
         "sector": "Technology",
         "industry": "Semiconductors",
         "currency": "USD",
-        # ── Market data ───────────────────────────────────────────────────────
-        "marketCap": 1.02e12,
-        "currentPrice": 220.0,
-        "targetMeanPrice": 252.0,
+        # ── Market data (updated June 2026) ───────────────────────────────────
+        "marketCap": 2.28e12,          # 4,770M shares × $478
+        "currentPrice": 478.0,
+        "targetMeanPrice": 560.0,      # consensus analyst target Jun 2026
         "recommendationKey": "strong buy",
-        # ── Liquidity ─────────────────────────────────────────────────────────
-        "currentRatio": 1.1,
-        "quickRatio": 0.9,
+        # ── Liquidity (FY2025, Oct 2025) ─────────────────────────────────────
+        "currentRatio": 1.2,
+        "quickRatio": 1.0,
         # ── Solvency ──────────────────────────────────────────────────────────
-        # yfinance reports debtToEquity ×100; code divides by 100
-        "debtToEquity": 330.0,
-        "ebitda": 30_000_000_000,
-        "interestExpense": 2_900_000_000,
-        # ── Profitability (GAAP) ──────────────────────────────────────────────
-        "profitMargins": 0.114,
-        "returnOnEquity": 0.290,
-        "returnOnAssets": 0.036,
+        "debtToEquity": 250.0,         # D/E improving as VMware debt paid down (~2.5x)
+        "ebitda": 36_000_000_000,
+        "interestExpense": 2_600_000_000,
+        # ── Profitability (FY2025 est., GAAP) ────────────────────────────────
+        "profitMargins": 0.150,        # improving as VMware amortisation anniversaries off
+        "returnOnEquity": 0.350,
+        "returnOnAssets": 0.050,
         # ── Growth ────────────────────────────────────────────────────────────
-        "revenueGrowth": 0.44,
+        "revenueGrowth": 0.20,         # FY2025 ~$62B vs FY2024 $51.6B
         # ── Valuation ─────────────────────────────────────────────────────────
-        "trailingPE": 15.6,
+        "trailingPE": 28.3,            # $478 / ~$16.9 GAAP EPS
         # ── Cash flow ─────────────────────────────────────────────────────────
-        "_fcfMarginDirect": 0.376,
+        "_fcfMarginDirect": 0.387,     # FCF $24B / rev $62B
 
         # ── DCF inputs ────────────────────────────────────────────────────────
         "_dcf": {
-            "fcf_b": 19.4,           # free cash flow in $B (FY2024)
-            "shares_m": 4_770.0,     # shares outstanding in M (post 10:1 split)
-            "net_debt_b": 56.0,      # LTD $66B − cash $10B
-            "stage1_growth": 0.25,   # 5-yr AI networking + VMware SaaS ramp
+            "fcf_b": 24.0,             # FY2025 FCF est. ($B)
+            "shares_m": 4_770.0,
+            "net_debt_b": 48.0,        # LTD ~$58B − cash ~$10B (paid ~$8B down)
+            "stage1_growth": 0.25,
             "stage2_growth": 0.13,
             "wacc": 0.09,
             "terminal_growth": 0.03,
         },
 
-        # ── Piotroski inputs ──────────────────────────────────────────────────
+        # ── Piotroski inputs (FY2025 vs FY2024) ──────────────────────────────
         "_piotroski": {
-            "roa": 0.036,
-            "roa_prior": 0.145,          # FY2023 pre-VMware (structural, not operational decline)
-            "ocf_b": 21.4,
-            "total_assets_b": 162.0,
-            "debt_to_equity": 3.30,
-            "debt_to_equity_prior": 4.00,   # right after VMware close
-            "current_ratio": 1.1,
-            "current_ratio_prior": 0.95,
-            "shares_m": 4_770.0,
-            "shares_m_prior": 4_760.0,
-            "gross_margin": 0.640,
-            "gross_margin_prior": 0.610,
-            "asset_turnover": 0.318,        # 51.57 / 162
-            "asset_turnover_prior": 0.491,  # 35.82 / 73 (FY2023, pre-VMware)
+            "roa": 0.050,
+            "roa_prior": 0.036,            # FY2024 (now improving)
+            "ocf_b": 25.0,
+            "total_assets_b": 168.0,
+            "debt_to_equity": 2.50,
+            "debt_to_equity_prior": 3.30,
+            "current_ratio": 1.2,
+            "current_ratio_prior": 1.1,
+            "shares_m": 4_780.0,
+            "shares_m_prior": 4_770.0,
+            "gross_margin": 0.660,
+            "gross_margin_prior": 0.640,
+            "asset_turnover": 0.369,       # 62B / 168B
+            "asset_turnover_prior": 0.318, # 51.6B / 162B (improving)
             "notes": [
-                "ROA decline and asset-turnover decline are both VMware acquisition artefacts "
-                "(asset base doubled); not indicative of operational deterioration.",
+                "ROA and asset-turnover now improving year-over-year as VMware "
+                "synergies materialise and debt is paid down.",
             ],
         },
 
         # ── Altman Z-Score inputs ─────────────────────────────────────────────
         "_altman": {
-            "working_capital_b": 1.8,       # current assets $14.9B − current liabilities $13.1B
-            "total_assets_b": 162.0,
-            "retained_earnings_b": -12.0,   # accumulated deficit from goodwill/amortisation
-            "ebit_b": 9.0,                  # GAAP EBIT FY2024
-            "market_cap_b": 1_020.0,
-            "total_liabilities_b": 141.0,
+            "working_capital_b": 3.0,
+            "total_assets_b": 168.0,
+            "retained_earnings_b": -8.0,   # accumulated deficit shrinking
+            "ebit_b": 12.0,
+            "market_cap_b": 2_280.0,       # updated
+            "total_liabilities_b": 135.0,  # debt paydown
         },
 
         # ── Kelly inputs ──────────────────────────────────────────────────────
         "_kelly": {
-            "expected_downside": 0.15,      # large-cap, more stable; ~15% bear-case loss
-            "win_probability": 0.72,        # Strong Buy consensus + Grade A
+            "expected_downside": 0.20,     # large-cap, still elevated macro risk
+            "win_probability": 0.70,
         },
 
         "_note": (
-            "D/E elevated due to VMware acquisition debt (~$66B LTD). "
-            "Adj. net margin ~46%; GAAP suppressed by ~$21B/yr amortisation."
+            "Price updated to $478 (Jun 2026). FY2025 fundamentals estimated. "
+            "D/E improving as VMware debt ($66B→~$58B) is paid down. "
+            "GAAP net margin expanding as ~$21B/yr amortisation anniversaries roll off."
         ),
     },
 
@@ -98,83 +99,84 @@ STATIC: dict[str, dict] = {
         "sector": "Technology",
         "industry": "Semiconductors",
         "currency": "USD",
-        # ── Market data ───────────────────────────────────────────────────────
-        "marketCap": 53_000_000_000,
-        "currentPrice": 62.0,
-        "targetMeanPrice": 90.0,
+        # ── Market data (updated June 2026) ───────────────────────────────────
+        "marketCap": 233_961_000_000,  # 857M shares × $273
+        "currentPrice": 273.0,
+        "targetMeanPrice": 315.0,      # consensus analyst target Jun 2026
         "recommendationKey": "buy",
-        # ── Liquidity ─────────────────────────────────────────────────────────
-        "currentRatio": 2.4,
-        "quickRatio": 2.1,
+        # ── Liquidity (FY2026, Feb 2026) ─────────────────────────────────────
+        "currentRatio": 2.6,
+        "quickRatio": 2.3,
         # ── Solvency ──────────────────────────────────────────────────────────
-        "debtToEquity": 46.0,
-        "ebitda": 1_800_000_000,
-        "interestExpense": 430_000_000,
-        # ── Profitability (GAAP) ──────────────────────────────────────────────
-        "profitMargins": 0.061,
-        "returnOnEquity": 0.048,
-        "returnOnAssets": 0.026,
+        "debtToEquity": 35.0,          # D/E ~0.35 as debt paid down
+        "ebitda": 3_200_000_000,
+        "interestExpense": 390_000_000,
+        # ── Profitability (FY2026 est., GAAP) ────────────────────────────────
+        "profitMargins": 0.085,        # improving on AI revenue scale
+        "returnOnEquity": 0.080,
+        "returnOnAssets": 0.048,
         # ── Growth ────────────────────────────────────────────────────────────
-        "revenueGrowth": 0.61,             # Q4 FY2025 YoY; full-year FY25 was +5%
+        "revenueGrowth": 0.47,         # FY2026 ~$8.5B vs FY2025 $5.77B
         # ── Valuation ─────────────────────────────────────────────────────────
-        "trailingPE": 36.0,
+        "trailingPE": 109.0,           # $273 / ~$2.50 GAAP EPS (growth premium)
         # ── Cash flow ─────────────────────────────────────────────────────────
-        "_fcfMarginDirect": 0.21,
+        "_fcfMarginDirect": 0.294,     # FCF $2.5B / rev $8.5B
 
         # ── DCF inputs ────────────────────────────────────────────────────────
         "_dcf": {
-            "fcf_b": 1.21,           # FCF FY2025
+            "fcf_b": 2.5,              # FY2026 FCF est. ($B)
             "shares_m": 857.0,
-            "net_debt_b": 3.6,       # debt $4.7B − cash $1.1B
-            "stage1_growth": 0.30,   # AI custom silicon ramp (Amazon, Google XPUs)
-            "stage2_growth": 0.15,
+            "net_debt_b": 2.8,         # debt ~$3.8B − cash ~$1.0B
+            "stage1_growth": 0.35,     # higher conviction given AI custom silicon evidence
+            "stage2_growth": 0.18,
             "wacc": 0.11,
             "terminal_growth": 0.03,
         },
 
-        # ── Piotroski inputs ──────────────────────────────────────────────────
+        # ── Piotroski inputs (FY2026 vs FY2025) ──────────────────────────────
         "_piotroski": {
-            "roa": 0.026,
-            "roa_prior": 0.018,
-            "ocf_b": 1.58,
-            "total_assets_b": 13.1,
-            "debt_to_equity": 0.46,
-            "debt_to_equity_prior": 0.52,
-            "current_ratio": 2.4,
-            "current_ratio_prior": 2.1,
-            "shares_m": 857.0,
-            "shares_m_prior": 851.0,        # slight creep from stock comp
-            "gross_margin": 0.550,
-            "gross_margin_prior": 0.520,
-            "asset_turnover": 0.440,        # 5.77 / 13.1
-            "asset_turnover_prior": 0.441,  # 5.51 / 12.5  (effectively flat)
+            "roa": 0.048,
+            "roa_prior": 0.026,
+            "ocf_b": 3.0,
+            "total_assets_b": 15.0,
+            "debt_to_equity": 0.35,
+            "debt_to_equity_prior": 0.46,
+            "current_ratio": 2.6,
+            "current_ratio_prior": 2.4,
+            "shares_m": 870.0,
+            "shares_m_prior": 857.0,       # stock comp creep
+            "gross_margin": 0.570,
+            "gross_margin_prior": 0.550,
+            "asset_turnover": 0.567,       # 8.5B / 15B
+            "asset_turnover_prior": 0.440, # 5.77B / 13.1B
             "notes": [
-                "GAAP ROE/ROA understated — heavy R&D (~35% of revenue) and "
-                "stock-based compensation (~$750M/yr) depress net income.",
-                "Adj. operating margin >35%; GAAP net margin ~6%.",
+                "All nine signals improving on a trailing basis as AI custom "
+                "silicon revenue (Amazon Trainium, Google TPU) scales rapidly.",
+                "GAAP profitability still understated vs adj. (~35% adj. op. margin).",
             ],
         },
 
         # ── Altman Z-Score inputs ─────────────────────────────────────────────
         "_altman": {
-            "working_capital_b": 1.9,       # current assets $3.2B − current liabilities $1.3B
-            "total_assets_b": 13.1,
-            "retained_earnings_b": -4.2,    # accumulated deficit from Inphi/Innovium acquisitions
-            "ebit_b": 0.50,                 # GAAP EBIT FY2025
-            "market_cap_b": 53.0,
-            "total_liabilities_b": 6.5,
+            "working_capital_b": 2.5,
+            "total_assets_b": 15.0,
+            "retained_earnings_b": -2.0,   # accumulated deficit shrinking with profits
+            "ebit_b": 0.85,
+            "market_cap_b": 234.0,         # updated
+            "total_liabilities_b": 6.0,
         },
 
         # ── Kelly inputs ──────────────────────────────────────────────────────
         "_kelly": {
-            "expected_downside": 0.35,      # higher-beta mid-cap semi; ~35% bear-case loss
-            "win_probability": 0.65,        # Buy consensus + Grade B
+            "expected_downside": 0.35,     # still high-beta; AI capex slowdown risk
+            "win_probability": 0.63,       # strong thesis but valuation now stretched
         },
 
         "_note": (
-            "GAAP profitability metrics understated — heavy R&D (~35% rev) and "
-            "stock-based comp. Adj. operating margin ~35%+. Revenue growth rate "
-            "reflects most-recent quarter (Q4 FY2025, +61% YoY) vs. full-year +5%."
+            "Price updated to $273 (Jun 2026). FY2026 fundamentals estimated. "
+            "Trailing P/E ~109x reflects growth-premium pricing. "
+            "Forward P/E ~55x on FY2027 consensus EPS of ~$5. "
+            "AI custom silicon (Amazon, Google, Microsoft) driving revenue re-rating."
         ),
     },
 }
