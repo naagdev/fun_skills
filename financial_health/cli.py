@@ -20,8 +20,8 @@ def main():
     for ticker in tickers:
         print(f"\nFetching data for {ticker} …")
         try:
-            report = analyze(ticker)
-            print_report(report)
+            report, meta = analyze(ticker)
+            print_report(report, note=meta.get("note", ""), source=meta.get("source", "live"))
         except Exception as e:
             print(f"  Error fetching {ticker}: {e}")
 

@@ -58,11 +58,12 @@ def _fmt_mktcap(v) -> str:
     return f"${v:,.0f}"
 
 
-def print_report(r: HealthReport) -> None:
+def print_report(r: HealthReport, note: str = "", source: str = "live") -> None:
     sep = "=" * 62
+    src_tag = "" if source == "live" else "  [cached fundamentals]"
 
     print(f"\n{sep}")
-    print(f"  FINANCIAL HEALTH REPORT — {r.ticker}")
+    print(f"  FINANCIAL HEALTH REPORT — {r.ticker}{src_tag}")
     print(sep)
     print(f"  Company   : {r.company_name}")
     print(f"  Sector    : {r.sector}  |  {r.industry}")
@@ -100,5 +101,7 @@ def print_report(r: HealthReport) -> None:
                        ("warning" if r.overall_score >= 45 else "poor"))
     print(f"  Overall Score : {score_col} / 100   Grade: {grade_str}")
     print(f"  Verdict       : {r.summary}")
+    if note:
+        print(f"\n  Note: {note}")
     print(sep)
     print()

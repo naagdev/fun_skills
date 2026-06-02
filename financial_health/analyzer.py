@@ -135,13 +135,46 @@ def _fcf_margin(info: dict, ticker_obj) -> Optional[float]:
     return None
 
 
+def _info_from_static(ticker_symbol: str) -> dict:
+    """Return static cached data for *ticker_symbol*, or {} if not available."""
+    try:
+        from .static_data import STATIC
+        entry = STATIC.get(ticker_symbol.upper(), {})
+        if not entry:
+            return {}
+        info = {k: v for k, v in entry.items() if not k.startswith("_")}
+        # Translate private convenience keys back to yfinance field names
+        if "_debtToEquity_raw" in entry:
+            info["debtToEquity"] = entry["_debtToEquity_raw"] * 100  # code divides by 100
+        if "_ebitda" in entry and "_interestExpense" in entry:
+            info["ebitda"] = entry["_ebitda"]
+            info["interestExpense"] = entry["_interestExpense"]
+        if "_fcfMargin" in entry:
+            info["_fcfMarginDirect"] = entry["_fcfMargin"]
+        info["_note"] = entry.get("_note", "")
+        info["_source"] = "static"
+        return info
+    except Exception:
+        return {}
+
+
 def analyze(ticker_symbol: str) -> HealthReport:
     """Fetch data and return a HealthReport for *ticker_symbol*."""
-    t = yf.Ticker(ticker_symbol.upper())
+    info: dict = {}
+    source = "live"
+
     try:
-        info = t.info or {}
+        t = yf.Ticker(ticker_symbol.upper())
+        fetched = t.info or {}
+        if fetched.get("regularMarketPrice") or fetched.get("currentPrice"):
+            info = fetched
     except Exception:
-        info = {}
+        pass
+
+    if not info:
+        info = _info_from_static(ticker_symbol)
+        source = info.get("_source", "static")
+        t = None  # no live object available
 
     name     = _safe(info, "longName", "shortName") or ticker_symbol.upper()
     sector   = _safe(info, "sector")   or "Unknown"
@@ -152,20 +185,30 @@ def analyze(ticker_symbol: str) -> HealthReport:
     tgt_px   = _safe(info, "targetMeanPrice")
     rec      = _safe(info, "recommendationKey")
 
+    def _interest_coverage(i):
+        ebitda = _safe(i, "ebitda")
+        intexp = _safe(i, "interestExpense")
+        if ebitda and intexp and intexp != 0:
+            return abs(ebitda / intexp)
+        return None
+
+    fcm = info.get("_fcfMarginDirect") or (
+        _fcf_margin(info, t) if t is not None else None
+    )
+
     raw: dict[str, Optional[float]] = {
         "current_ratio":     _safe(info, "currentRatio"),
         "quick_ratio":       _safe(info, "quickRatio"),
         "debt_to_equity":    (lambda v: v / 100 if v else None)(_safe(info, "debtToEquity")),
-        "interest_coverage": _safe(info, "ebitda", default=None) and (
-            (_safe(info, "ebitda") / _safe(info, "interestExpense", default=1))
-            if _safe(info, "interestExpense") else None
-        ),
+        "interest_coverage": _interest_coverage(info),
         "net_margin":        _safe(info, "profitMargins"),
         "roe":               _safe(info, "returnOnEquity"),
         "roa":               _safe(info, "returnOnAssets"),
-        "revenue_growth":    _safe(info, "revenueGrowth") or _revenue_growth(t),
+        "revenue_growth":    _safe(info, "revenueGrowth") or (
+            _revenue_growth(t) if t is not None else None
+        ),
         "pe_ratio":          _safe(info, "trailingPE", "forwardPE"),
-        "fcf_margin":        _fcf_margin(info, t),
+        "fcf_margin":        fcm,
     }
 
     metrics: list[MetricResult] = []
@@ -194,7 +237,7 @@ def analyze(ticker_symbol: str) -> HealthReport:
     else:
         grade, verdict = "F", "Poor financial health — avoid unless speculative risk is intentional."
 
-    return HealthReport(
+    report = HealthReport(
         ticker=ticker_symbol.upper(),
         company_name=name,
         sector=sector,
@@ -209,3 +252,5 @@ def analyze(ticker_symbol: str) -> HealthReport:
         grade=grade,
         summary=verdict,
     )
+    meta = {"source": source, "note": info.get("_note", "")}
+    return report, meta
