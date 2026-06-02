@@ -149,8 +149,8 @@ def _info_from_static(ticker_symbol: str) -> dict:
         if "_ebitda" in entry and "_interestExpense" in entry:
             info["ebitda"] = entry["_ebitda"]
             info["interestExpense"] = entry["_interestExpense"]
-        if "_fcfMargin" in entry:
-            info["_fcfMarginDirect"] = entry["_fcfMargin"]
+        if "_fcfMarginDirect" in entry:
+            info["_fcfMarginDirect"] = entry["_fcfMarginDirect"]
         info["_note"] = entry.get("_note", "")
         info["_source"] = "static"
         return info
